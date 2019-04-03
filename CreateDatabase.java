@@ -12,8 +12,14 @@ package createdatabase;
 import java.util.Scanner;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.Files;
+import java.util.Base64;
+import java.util.Base64.Encoder;
+import java.util.Base64.Decoder;
+import javax.xml.bind.DatatypeConverter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,7 +31,7 @@ public class CreateDatabase {
     
 	
 	
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         Scanner scnr = new Scanner(System.in);
         String databasename = "";
         String masterPW = "";
@@ -116,7 +122,22 @@ public class CreateDatabase {
         writer.println("description for account = " + desc);
         writer.close();
         
+        File f = new File(databasename + ".txt");
         
+        byte[] fileContent = Files.readAllBytes(f.toPath());
+        
+        
+        String encoded = Base64.getEncoder().encodeToString(fileContent); //put byte into this to get encoded string
+        
+        try {
+            writer = new PrintWriter(databasename + ".txt", "UTF-8"); //think about using json/xml file
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(CreateDatabase.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(CreateDatabase.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        writer.println(encoded);
+        writer.close();
     }
     
 }
