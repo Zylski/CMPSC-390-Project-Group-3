@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package createdatabase;
+package loaddatabase;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -29,7 +29,7 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public class Decryption {   
     public static void decrypt (String databasename, String password) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException {
-        File f = new File(databasename + "_encrypted.txt");
+        File f = new File(databasename + "_encrypted.json");
        
         //String encoded = new String(Files.readAllBytes(f.toPath()));
         
@@ -49,11 +49,11 @@ public class Decryption {
         //print out decoded database
         PrintWriter writer = null;
         try {
-            writer = new PrintWriter(databasename + "_decrypted.txt", "UTF-8"); //think about using json/xml file
+            writer = new PrintWriter(databasename + "_decrypted.json", "UTF-8"); //think about using json/xml file
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(CreateDatabase.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(LoadDatabase.class.getName()).log(Level.SEVERE, null, ex);
         } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(CreateDatabase.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(LoadDatabase.class.getName()).log(Level.SEVERE, null, ex);
         }
         writer.print(decryptedStr);
         writer.close();

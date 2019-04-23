@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package createdatabase;
+package loaddatabase;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -29,7 +29,7 @@ import javax.crypto.spec.SecretKeySpec;
 public class Encryption{
     public static void encrypt (String databasename, String password) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException {
         
-       File f = new File(databasename + ".txt"); 
+       File f = new File(databasename + ".json"); 
         
       SecretKeySpec skeyspec = new SecretKeySpec(password.getBytes(), "Blowfish");
       Cipher cipher = Cipher.getInstance("Blowfish");
@@ -45,11 +45,11 @@ public class Encryption{
 //        String encoded = Base64.getEncoder().encodeToString(fileContent); //put byte into this to get encoded string
         PrintWriter writer = null;
         try {
-            writer = new PrintWriter(databasename + "_encrypted.txt", "UTF-8"); //think about using json/xml file
+            writer = new PrintWriter(databasename + "_encrypted.json", "UTF-8"); //think about using json/xml file
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(CreateDatabase.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(LoadDatabase.class.getName()).log(Level.SEVERE, null, ex);
         } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(CreateDatabase.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(LoadDatabase.class.getName()).log(Level.SEVERE, null, ex);
         }
         writer.print(encoded);
         writer.close();

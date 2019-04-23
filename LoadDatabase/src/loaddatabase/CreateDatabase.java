@@ -3,12 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package createdatabase;
+package loaddatabase;
 
 /**
  *
  * @author bh19601
  */
+import com.google.gson.Gson;
 import java.util.Scanner;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -33,23 +34,19 @@ public class CreateDatabase {
     /**
      * @param args the command line arguments
      */
-    public static String Encrypt (String str){
-        
-        return str;
-    }
-	
+    
+//    public static String Encrypt (String str){
+//        
+//        return str;
+//    }
+//	
 	
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         Scanner scnr = new Scanner(System.in);
         String databasename = "";
         String masterPW = "";
         String masterPWcheck = "";
-        String name = "";
-        String username = "";
-        String password = "";
-        String passwordcheck = "";
-        String url = "";
-        String desc = "";
+        Database db = new Database();
         
         //Make strings into an array so i could bot with one method to fill in stuff?
         
@@ -71,63 +68,25 @@ public class CreateDatabase {
                     masterPWcheck = scnr.nextLine();
             }
         }
-        
-        while (name.length() < 1){
-            System.out.println("Input what account is for: ");
-            name = scnr.nextLine();
-        }
-        
-        while (username.length() < 1){
-            System.out.println("Input username of account: ");
-            username = scnr.nextLine();
-        }
-        
-        while (password.length() < 1){
-            System.out.println("Input password of account: ");
-            password = scnr.nextLine();
-            System.out.println("Type in password again");
-            passwordcheck = scnr.nextLine();
-                while (!password.equals(passwordcheck)){
-                    System.out.println("Passwords didn't match, try again: ");
-                    System.out.println("Input password of account: ");
-                    password = scnr.nextLine();
-                    System.out.println("Type in password again");
-                    passwordcheck = scnr.nextLine();
-            }
-        }
-        
-        while (url.length() < 1){
-            System.out.println("Input url associated with the account: ");
-            url = scnr.nextLine();
-        }
-        
-        while (desc.length() < 1){
-            System.out.println("Input description for the account: ");
-            desc = scnr.nextLine();
-        }
+      
         System.out.println("");
         System.out.println("master password = " + masterPW);
-        System.out.println("name for account = " + name);
-        System.out.println("username for account = " + username);
-        System.out.println("password for account = " + password);
-        System.out.println("url for account = " + url);
-        System.out.println("description for account = " + desc);
+        db.setMasterpassword(masterPW);
         
+        Gson gson = new Gson();
+
+        String json = gson.toJson(db);
+
         PrintWriter writer = null;
         try {
-            writer = new PrintWriter(databasename + ".txt", "UTF-8"); //think about using json/xml file
+            writer = new PrintWriter(databasename + ".json", "UTF-8"); //think about using json/xml file
         } catch (FileNotFoundException ex) {
             Logger.getLogger(CreateDatabase.class.getName()).log(Level.SEVERE, null, ex);
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(CreateDatabase.class.getName()).log(Level.SEVERE, null, ex);
         }
-        writer.println("master password = " + masterPW);
-		writer.println("");
-        writer.println("name for account = " + name);
-        writer.println("username for account = " + username);
-        writer.println("password for account = " + password);
-        writer.println("url for account = " + url);
-        writer.println("description for account = " + desc);
+        writer.print(json);
+
         writer.close();
         
         String password_encrypt = "Password$2";
