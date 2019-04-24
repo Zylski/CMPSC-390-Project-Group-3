@@ -75,6 +75,7 @@ public class AddAccount {
          sqAnswer = scnr.nextLine();
          sqAnswer = sqAnswer.toLowerCase();
          ArrayList<SecurityQuestion> sq = new ArrayList<SecurityQuestion>();
+         
          if (sqAnswer.equals("y")){
              while (sqAnswer.equals("y")){
          
@@ -108,7 +109,7 @@ public class AddAccount {
          System.out.println("Property");
          property = scnr.nextLine();
          
-         System.out.println("Peroperty Answer");
+         System.out.println("Property Answer");
          propertyAnswer = scnr.nextLine();
          
          ap.add(new AdditionalProperties(property, propertyAnswer));
@@ -121,6 +122,9 @@ public class AddAccount {
          else{
              ap.add(new AdditionalProperties());
          }
+         
+         a.setSecurityQuestion(sq);
+         a.setAdditionalProperties(ap);
          
          Gson gson = new Gson();
          

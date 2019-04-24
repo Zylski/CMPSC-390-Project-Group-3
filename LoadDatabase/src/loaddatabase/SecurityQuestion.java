@@ -45,13 +45,13 @@ public class SecurityQuestion {
             
         }
         else{
-        System.out.println("Security Question is: " + Question);
+        System.out.println("Security question is: " + Question);
         }
         if(Question.equals("")){
             
         }
         else{        
-        System.out.println("Secuirty question is: " + Answer);
+        System.out.println("Secuirty question answer is: " + Answer);
         }
     }
     

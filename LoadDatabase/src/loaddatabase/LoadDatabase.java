@@ -38,7 +38,7 @@ public class LoadDatabase {
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         Scanner scnr = new Scanner(System.in);
         System.out.println("Type in name for database you wish to load m'lord: ");
-        String databasename = scnr.nextLine();//Add if-else to check whether or not file exists later on
+        String databasename = scnr.nextLine();
         
         Gson gson = new Gson();
         

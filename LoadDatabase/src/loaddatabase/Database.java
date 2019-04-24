@@ -18,7 +18,7 @@ public class Database {
                 
         public Database(){
             masterPassword = "";
-            account.add(new Account());
+            //account.add(new Account());
         }
     
     public String getMasterpassword() {
@@ -41,7 +41,11 @@ public class Database {
         account.add(a);
     }
     public void deleteAccount(Account a){
-        //input
+        for (int i = 0;i<account.size();i++){
+            if (account.get(i).equals(a));{
+            account.remove(i);
+        }
+        }
     }
     
     public void writeOutput(){

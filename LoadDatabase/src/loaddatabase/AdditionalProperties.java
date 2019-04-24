@@ -44,13 +44,13 @@ public class AdditionalProperties {
             
         }
         else{
-        System.out.println("Security Question is: " + property);
+        System.out.println("Additional property is: " + property);
         }
         if(propertyAnswer.equals("")){
             
         }
         else{        
-        System.out.println("Secuirty question is: " + propertyAnswer);
+        System.out.println("Additional property answer is: " + propertyAnswer);
         }
     }
     

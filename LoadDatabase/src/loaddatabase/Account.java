@@ -42,8 +42,8 @@ public class Account
         url = "None";
         description = "None";
         category = "";
-        SecurityQuestions.add(new SecurityQuestion());
-        AdditionalProperties.add(new AdditionalProperties());
+        //SecurityQuestions.add(new SecurityQuestion());
+        //AdditionalProperties.add(new AdditionalProperties());
     }
     public Account(String l, String u, String p, String ur, String d, ArrayList<SecurityQuestion> sq, ArrayList<AdditionalProperties> ap)
     {
@@ -52,6 +52,9 @@ public class Account
         password = p;
         url = ur;
         description = d;
+        SecurityQuestions = sq;
+        AdditionalProperties = ap;
+        
     }
     //mutators
     //label
@@ -145,7 +148,14 @@ public class Account
         else{
             System.out.println("Category: " + category);   
         }
-        //add output for security questions and additional properties
+        
+        for (int i = 0;i<SecurityQuestions.size();i++){
+            SecurityQuestions.get(i).writeOutput();
+        }
+        
+        for (int i = 0;i<AdditionalProperties.size();i++){
+            AdditionalProperties.get(i).writeOutput();
+        }
         
     }
     //Same label?
@@ -173,6 +183,16 @@ public class Account
             return 0; 
         }
         return 0; //default
+    }
+    
+        public boolean compareToString(String a)
+    {//comparing labels
+        if(label.equals(a) == true){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
     
     //toString
