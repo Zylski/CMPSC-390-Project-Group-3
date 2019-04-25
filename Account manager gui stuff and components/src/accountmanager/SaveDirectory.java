@@ -37,7 +37,7 @@ public class SaveDirectory
         File file = new File("C:\\Users\\Zylski\\Documents\\AccountManager Databases");
         f.setTitle("Save Database");
         f.setInitialDirectory(file);
-        f.setInitialFileName(name + ".dat");
+        f.setInitialFileName(name + ".json");
         file = f.showSaveDialog(stage);
         
         return file;

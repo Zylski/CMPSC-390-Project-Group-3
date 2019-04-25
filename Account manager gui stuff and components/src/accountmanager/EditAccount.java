@@ -3,21 +3,18 @@ package accountmanager;
  *Programmer: Damian Zylski
  *System: Windows XP Netbeans 8
  *Date: 03/27/2019
- *Project: Add account
+ *Project: Edit account
  * 
- * Purpose: To create a gui to collect user information for adding a new account to
- * the database. Thanks to Oracle.com and StackOverflow.com for examples
+ * Purpose: To edit an existing account
  * 
  * -----------------------------------------------------------------------------------
  */
 //import java.awt.Insets;
 import com.google.gson.Gson;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.file.Files;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -46,19 +43,19 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
 
-public class AddAccount
+public class EditAccount
 {
     //attrib
     private Scene scene;
     private static String fieldCategory = "General";
     //constructor
-    public AddAccount()
+    public EditAccount()
     {
         
     }
     
 //**STAGE**********************************************************************    
-    public Scene openScene(Stage stage, String fileName, String masterPass) 
+    public Scene openScene(Stage stage, String fileName, String masterPass, Account a,int target) 
     {
         
         //form area        s
@@ -71,13 +68,13 @@ public class AddAccount
         
         
         //Title
-        Text scenetitle = new Text("Add Account");
+        Text scenetitle = new Text("Edit Account");
         scenetitle.setFont(Font.font("Courier New", FontWeight.BOLD, 20));
         grid.add(scenetitle, 0, 0, 2, 1);
         
         AccountManager account = new AccountManager();
         
-        account.setStatusBar("Account not added to database");
+        account.setStatusBar("Account not Edited");
         
         //Account label
         Label accountLabel = new Label("Account Label:");
@@ -85,36 +82,42 @@ public class AddAccount
 
         TextField labelTextField = new TextField();
         grid.add(labelTextField, 1, 1);
+        labelTextField.setText(a.getLabel());
         //UserName
         Label userName = new Label("User Name:");
         grid.add(userName, 0, 2);
 
         TextField userTextField = new TextField();
         grid.add(userTextField, 1, 2);
+        userTextField.setText(a.getUsername());
         //Password
         Label pw = new Label("Password:");
         grid.add(pw, 0, 3);
 
         PasswordField pwBox = new PasswordField();
         grid.add(pwBox, 1, 3);
+        pwBox.setText(a.getPassword());
         //reenter password
         Label pwC = new Label("Confirm Password:");
         grid.add(pwC, 0, 4);
 
         PasswordField pwCBox = new PasswordField();
         grid.add(pwCBox, 1, 4);
+        pwCBox.setText(a.getPassword());
         //URL
         Label urlLabel = new Label("URL/Location:");
         grid.add(urlLabel, 0, 5);
 
         TextField urlField = new TextField();
         grid.add(urlField, 1, 5);
+        urlField.setText(a.getUrl());
         //Category
         Label catLabel = new Label("Category:");
         grid.add(catLabel, 0, 6);
 
         TextField categoryField = new TextField();
         grid.add(categoryField, 1, 6);
+        categoryField.setText(a.getCategory());
         if(fieldCategory.equalsIgnoreCase("all") || fieldCategory.equalsIgnoreCase("categories"))
         {
             fieldCategory = "General";
@@ -129,6 +132,7 @@ public class AddAccount
         descTextField.setPrefHeight(100);  
         descTextField.setPrefWidth(200);   
         grid.add(descTextField, 1, 7);
+        descTextField.setText(a.getDescription());
         
         //Submit button
         Button submit = new Button();
@@ -196,40 +200,36 @@ public class AddAccount
                         category = "General";
                     }
                     //TEMP Display input fields
-                    submitPress.setText("Account Added\n");
+                    submitPress.setText("Account Edited\n");
+                    
+                    System.out.println(target);
+                    
+                    account.editAccount(target, labelInput, userNameInput, passWordInput, urlInput, description, category);
                     
                     //Do this to clear a file?
                     try
                     {
-                    PrintWriter w = new PrintWriter(fileName);
-                    w.print("");
-                    w.close();
+                        PrintWriter w = new PrintWriter(fileName);
+                        w.print("");
+                        w.close();
                     }
-                    catch (IOException ex) 
+                    catch (IOException ex)
                     {
                         Logger.getLogger(CreateDatabase.class.getName()).log(Level.SEVERE, null, ex);
-                    } 
-                    
-                    //append new account to DB file
+                    }
+
+                    //append edited account to DB file
                     PrintWriter writer = null;
-                    try 
+                    try
                     {
-                        FileWriter fw = new FileWriter(fileName,true);
+                        FileWriter fw = new FileWriter(fileName, true);
                         BufferedWriter bw = new BufferedWriter(fw);
                         writer = new PrintWriter(bw); //think about using json/xml file
-                    } 
-                    catch (IOException ex) 
+                    }
+                    catch (IOException ex)
                     {
                         Logger.getLogger(CreateDatabase.class.getName()).log(Level.SEVERE, null, ex);
-                    } 
-                    
-                    //create new account object and add to array list
-                    account.addAccount(labelInput, userNameInput, passWordInput, urlInput, description,category);
-                    
-                    //Make new Database object
-                    //Database db = new Database();
-                    //set master password
-                    //db.setMasterpassword(masterPass);
+                    }
                     
                     //get accountList
                     ArrayList <Account> accountList = new ArrayList <Account>();
@@ -290,7 +290,7 @@ public class AddAccount
                     
                     writer.close();
                     
-                    account.setStatusBar("Account added to database");
+                    account.setStatusBar("Account Edited");
 
                     //close the stage
                     stage.close();

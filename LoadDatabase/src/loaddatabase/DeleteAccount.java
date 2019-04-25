@@ -66,16 +66,19 @@ public class DeleteAccount {
         
         account = db.getAccount();
         
-        for(int i = 0;i<account.size();i++){
+        for(int i = 0;i<account.size();i++)
+		{
             if (account.get(i).compareToString(accountLabel) == true){
                 account.remove(i);
                 System.out.println("Account removed");
             }
-            else{
-            if (i == account.size() - 1){
-            System.out.println("Account not found/No account was deleted.");
+            else
+			{
+            if (i == account.size() - 1)
+			{
+				System.out.println("Account not found/No account was deleted.");
             }
-        }
+			}
         }
         
         String dbString = gson.toJson(db, Database.class);

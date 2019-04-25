@@ -10,14 +10,14 @@ package accountmanager;
  * -----------------------------------------------------------------------------------
  */
 //import java.awt.Insets;
+import com.google.gson.Gson;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Scanner;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -164,20 +164,32 @@ public class LoadDatabase
                 else
                 {
                     //open database file
+                    String dbStringD = "";
                     try
                     {
                         System.out.println("Reading " + f +  "...");
                         fin = new FileInputStream(f);
+                        file = new File(f);
                         inputFile = new Scanner(fin);
+                        dbStringD = new String(Files.readAllBytes(file.toPath()));
                     }
-                    catch(FileNotFoundException e)
+                    catch(IOException e)
                     {
                         System.out.println("File is missing or corrupt!");
                     }
+                    
+                    //make new gson object
+                    Gson gson = new Gson();
+                    
+                    
+                    
                     String encrypted = inputFile.nextLine();
                     String decrypted = encrypted;
                     
+                    
+
                     //TO DO ask for password
+                    
                     try
                     {
                     Decrypt d = new Decrypt();
@@ -219,76 +231,39 @@ public class LoadDatabase
                             stage.showAndWait();
                     }
                     
-                    
-                    if((!decrypted.equals(encrypted)))
-                    {
-                    //clear old arraylist contents
-                    accountList.clearAccount();
-                    }
-                    
-                    //make new Account object
-                    Account a = new Account();
-                    
                     //make strings
                     String label = "NULL";
                     String username = "NULL";
                     String password = "NULL";
                     String url = "NULL";
                     String description = "NULL";
+                    String category = "NULL";
                     
                     //decrypt and add accounts to arraylist
-                    while(inputFile.hasNextLine() && (!decrypted.equals(encrypted)))
-                    {   
-                        //decrypt
-                        try
-                        {
-                        Decrypt d = new Decrypt();
-                        label = d.decrypt(inputFile.nextLine(), passWordInput);
-                        username = d.decrypt(inputFile.nextLine(), passWordInput);
-                        password = d.decrypt(inputFile.nextLine(), passWordInput);
-                        url = d.decrypt(inputFile.nextLine(), passWordInput);
-                        description = d.decrypt(inputFile.nextLine(), passWordInput);
-                        }
-                        catch(NoSuchAlgorithmException ne)
-                        {
-                            System.out.println("bad key!");
-                            stage.close();
-                            stage.setScene(errorScene);
-                            stage.showAndWait();
-                        }
-                        catch(NoSuchPaddingException p)
-                        {
-                            System.out.println("bad key!");
-                            stage.close();
-                            stage.setScene(errorScene);
-                            stage.showAndWait();
-                        }
-                        catch(InvalidKeyException i)
-                        {
-                            System.out.println("bad key!");
-                            stage.close();
-                            stage.setScene(errorScene);
-                            stage.showAndWait();
-                        }
-                        catch(IllegalBlockSizeException ib)
-                        {
-                            System.out.println("bad key!");
-                            stage.close();
-                            stage.setScene(errorScene);
-                            stage.showAndWait();
-                        }
-                        catch(BadPaddingException bp)
-                        {
-                            System.out.println("bad key!");
-                            stage.close();
-                            stage.setScene(errorScene);
-                            stage.showAndWait();
-                            
-                        }
-                        //add to account list
-                        accountList.setAccount(label, username, password, url, description);
-                     }
                     
+                    if((!decrypted.equals(encrypted)))
+                    {
+                        //clear old arraylist contents
+                        accountList.clearAccount();
+                    
+                        //make new database object
+                        Database db = gson.fromJson(decrypted,Database.class);
+                        
+                        //Add accounts back to main ArrayList
+                        for(int i = 0; i < db.getAccount().size(); i++)
+                        {
+                            label = db.getAccount().get(i).getLabel();
+                            username = db.getAccount().get(i).getUsername();
+                            password = db.getAccount().get(i).getPassword();
+                            url = db.getAccount().get(i).getUrl();
+                            description = db.getAccount().get(i).getDescription();
+                            category = db.getAccount().get(i).getCategory();
+                            
+                            //add to account list
+                            accountList.addAccount(label, username, password, url, description, category);
+                        }
+                     
+                    }
                     if(!decrypted.equals(encrypted))
                     {
                     accountList.setStatusBar("Database Loaded");

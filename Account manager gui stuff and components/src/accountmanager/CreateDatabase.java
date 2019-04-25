@@ -12,6 +12,7 @@ package accountmanager;
  * -----------------------------------------------------------------------------------
  */
 //import java.awt.Insets;
+import com.google.gson.Gson;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -154,6 +155,10 @@ public class CreateDatabase
         grid.add(hbBtn, 1, 7);
         final Text submitPress = new Text();
         grid.add(submitPress, 1, 8);
+        
+        //make new database object for the json file
+        Database db = new Database();
+        //button action
         createBtn.setOnAction(new EventHandler<ActionEvent>() 
         {
             @Override
@@ -193,7 +198,13 @@ public class CreateDatabase
                 //if everything matches up, create a new account class and add to database
                 else
                 {
-                    //create database file
+                    //set master password in db object
+                    db.setMasterpassword(passWordInput);
+                    
+                    //convert that to json
+                    Gson gson = new Gson();
+                    String json = gson.toJson(db);
+                    
                     PrintWriter writer = null;
                     try 
                     {
@@ -215,7 +226,7 @@ public class CreateDatabase
                     try
                     {
                     Encrypt e = new Encrypt();
-                    passWordInput = e.encrypt(passWordInput, passWordInput);
+                    json = e.encrypt(json, passWordInput);
                     
                     }
                     catch(NoSuchAlgorithmException ne)
@@ -238,7 +249,7 @@ public class CreateDatabase
                     {
                         
                     }
-                    writer.print(passWordInput);
+                    writer.print(json);
                     //writer.print(nameInput);
                             
                     writer.close();

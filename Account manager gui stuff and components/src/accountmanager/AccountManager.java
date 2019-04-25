@@ -29,8 +29,10 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.IndexRange;
 import javafx.scene.control.TextArea;
 import javafx.scene.text.Font;
@@ -46,10 +48,16 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
+import javafx.scene.control.TreeCell;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -72,12 +80,18 @@ public class AccountManager extends Application
     
     //status bar
     private static TextField statusBar = new TextField();
+    
+    //category
+    private static String category = "";
+    
+    //delete choice
+    private static boolean deleteInputChoice = false;
 
     public AccountManager()
     {
         
     }
-    
+    //GLOBAL STUFF
     //table
     public static TableView<Account> table = new TableView<>();
     
@@ -89,6 +103,8 @@ public class AccountManager extends Application
         
         //for paste operations
         public static String clipboardText = "";
+        
+        
     
     @Override
     public void start(Stage primaryStage)
@@ -108,7 +124,7 @@ public class AccountManager extends Application
         Text scenetitle = new Text("Account Manager");
         scenetitle.setFont(Font.font("Courier New", FontWeight.BOLD, 20));
         
-        //menu bar
+//******menu bar***********************************************************************************************************
         MenuBar menuBar = new MenuBar();
         Menu menuFile = new Menu("File");
         Menu menuEdit = new Menu("Edit");
@@ -174,7 +190,7 @@ public class AccountManager extends Application
         accountDisplay.setMinWidth(100);
         accountDisplay.setEditable(false);
         
-        //table view?
+//******table view************************************************************************************************************?
 
         // columns?
         TableColumn<Account, String> accountCol = new TableColumn<>("Account");
@@ -268,11 +284,128 @@ public class AccountManager extends Application
         
         table.getColumns().addAll(accountCol, passwordCol,revealCol);
         table.setEditable(true);
-        //table.setMinWidth(500);
         
-        //toolbar
+        //Table context menu?
+        ContextMenu cm = new ContextMenu();
+        MenuItem mi1 = new MenuItem("Delete Account");
+        cm.getItems().add(mi1);
+        MenuItem mi2 = new MenuItem("Edit Account");
+        cm.getItems().add(mi2);
+        MenuItem mi3 = new MenuItem("Cancel");
+        cm.getItems().add(mi3);
+
+        table.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>()
+        {
+
+            @Override
+            public void handle(MouseEvent t)
+            {
+                if (t.getButton() == MouseButton.SECONDARY)
+                {
+                    cm.show(table, t.getScreenX(), t.getScreenY());
+                }
+            }
+        });
+        
+//******TREE VIEW FOR CATEGORIES*****************************************************************************************************
+        //folder icons for categories
+        Node treeIcon32 = new ImageView(
+                new Image(getClass().getResourceAsStream("resources/FOLDER32.png"))
+        );
+
+        TreeItem<String> treeRoot = new TreeItem<String>("Categories", treeIcon32);
+        treeRoot.setExpanded(true);
+
+        //Add all folder
+        Node treeIcon16 = new ImageView(
+                new Image(getClass().getResourceAsStream("resources/FOLDER16.png"))
+        );
+        TreeItem<String> all = new TreeItem<String>("All", treeIcon16);
+        treeRoot.getChildren().add(all);
+
+        //add a general folder
+        Node treeIcon162 = new ImageView(
+                new Image(getClass().getResourceAsStream("resources/FOLDER16.png"))
+        );
+        TreeItem<String> general = new TreeItem<String>("General", treeIcon162);
+        treeRoot.getChildren().add(general);
+
+        TreeView tree = new TreeView<String>(treeRoot);
+        
+        //tree actions when category is clicked
+        EventHandler<MouseEvent> mouseEventHandle = (MouseEvent event) ->
+        {
+            String catName = handleMouseClicked(event,tree);
+            
+            //The below code should probably be a method because it repeats. But I'm lazy.
+            int i = 0;
+            int size = accountList.size(); //account list size
+
+            //clear the table
+            table.getItems().clear();
+            for (i = 0; i < size; i++)
+            {
+                //Create table entry only if the category exists!
+                if(accountList.get(i).getCategory().equalsIgnoreCase(catName) || catName.equalsIgnoreCase("all"))
+                {
+                    //create the rows in the table
+                    accountCol.setCellValueFactory(new PropertyValueFactory<>("info"));
+                    passwordCol.setCellValueFactory(new PropertyValueFactory<>("mask"));
+
+                    table.getItems().add(accountList.get(i));
+                }
+            }
+        };
+
+        tree.addEventHandler(MouseEvent.MOUSE_CLICKED, mouseEventHandle);
+
+        //tree view context menu?
+        ContextMenu treeCm = new ContextMenu();
+        //Add a category
+        MenuItem treeMi1 = new MenuItem("Add Category");
+        treeMi1.setOnAction(new EventHandler<ActionEvent>()
+        {
+            public void handle(ActionEvent e)
+            {
+                AddCategory addCat = new AddCategory();
+                stage.setScene(addCat.openScene(stage));
+
+                stage.showAndWait();
+
+                addCategory(treeRoot);
+                //set category back to blank
+                getCategory("");
+            }
+        });
+        treeCm.getItems().add(treeMi1);
+        //cancel
+        MenuItem treeMi2 = new MenuItem("Cancel");
+        treeMi2.setOnAction(new EventHandler<ActionEvent>()
+        {
+            public void handle(ActionEvent e)
+            {
+                System.out.println("No");
+            }
+        });
+        treeCm.getItems().add(treeMi2);
+
+        tree.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>()
+        {
+
+            @Override
+            public void handle(MouseEvent c)
+            {
+                if (c.getButton() == MouseButton.SECONDARY)
+                {
+                    treeCm.show(tree, c.getScreenX(), c.getScreenY());
+                }
+            }
+        });
+        
+//******toolbar***************************************************************************************************************
         ToolBar toolBar = new ToolBar();
-        //create db button
+        
+//******CREATE DATABASE BUTTON*****************************************************************************************************
         Button createDB = new Button();
         createDB.setText("Create Database");
 
@@ -291,7 +424,7 @@ public class AccountManager extends Application
                   }
                   else
                   {
-                      statusBar.setText("Database Created");
+                      statusBar.setText("Database Created"); //Maybe try a boolean check for whether anything was changed?
                       
                       //Since new db is created, clear the table
                       table.getItems().clear();
@@ -303,7 +436,7 @@ public class AccountManager extends Application
         });
         
 
-        //add account button
+//******ADD ACCOUNT BUTTON*****************************************************************************************************
         Button addAccount = new Button();
         addAccount.setText("Add Account");
         AddAccount add = new AddAccount();
@@ -322,20 +455,42 @@ public class AccountManager extends Application
                       
                       //The below code should probably be a method because it repeats. But I'm lazy.
                       int i = 0;
-                      int size = accountList.size();
-
+                      int size = accountList.size(); //account list size
+                      tree.getRoot().setExpanded(true); //expand the tree
+                      int treeSize = tree.getExpandedItemCount(); //size of tree
+                      String currentCat = ""; //current category
+                      String treeCat = ""; //cat from tree
+                      boolean catExists = false; //check if category exists
                       //clear the table
                       table.getItems().clear();
-
-                      for(i = 0; i < size; i++)
+                      for (i = 0; i < size; i++)
                       {
 
-                      //create the rows in the table
-                            accountCol.setCellValueFactory(new PropertyValueFactory<>("info"));
-                            passwordCol.setCellValueFactory(new PropertyValueFactory<>("mask"));
+                          //create the rows in the table
+                          accountCol.setCellValueFactory(new PropertyValueFactory<>("info"));
+                          passwordCol.setCellValueFactory(new PropertyValueFactory<>("mask"));
 
-                            table.getItems().add(accountList.get(i));
+                          table.getItems().add(accountList.get(i));
 
+                          currentCat = "TreeItem [ value: " + accountList.get(i).getCategory() + " ]";
+
+                          //add new categories if they exist in db
+                          for (int j = 1; j < treeSize; j++)
+                          {
+                              treeCat = tree.getTreeItem(j).toString();
+                              if (treeCat.equalsIgnoreCase(currentCat))
+                              {
+                                  catExists = true;
+                              }
+                          }
+                          //if category doesn't exist in the tree, add it!
+                          if (!catExists)
+                          {
+                              category = accountList.get(i).getCategory();
+                              addCategory(treeRoot);
+                              category = "";
+                          }
+                          catExists = false;
                       }
                       statusBar.setText("Account Added to Database");
                   }
@@ -350,7 +505,7 @@ public class AccountManager extends Application
 
             }
         });
-        //add load account button
+//******LOAD ACCOUNT BUTTON*****************************************************************************************************
         Button loadDatabase = new Button();
         loadDatabase.setText("Load Database");
         TableCell rowCell = new TableCell();
@@ -361,24 +516,46 @@ public class AccountManager extends Application
             public void handle(ActionEvent event)
             {
                   stage.setScene(load.openScene(stage));
-                  
                   stage.showAndWait();
                   
                   int i = 0;
-                  int size = accountList.size();
-                  
-                  //clear the table
-                  table.getItems().clear();
-                  
-                  for(i = 0; i < size; i++)
-                  {
-                   
-                  //create the rows in the table
-                        accountCol.setCellValueFactory(new PropertyValueFactory<>("info"));
-                        passwordCol.setCellValueFactory(new PropertyValueFactory<>("mask"));
+                int size = accountList.size(); //account list size
+                tree.getRoot().setExpanded(true); //expand the tree
+                int treeSize = tree.getExpandedItemCount(); //size of tree
+                String currentCat = ""; //current category
+                String treeCat = ""; //cat from tree
+                boolean catExists = false; //check if category exists
+                //clear the table
+                table.getItems().clear();
+                for (i = 0; i < size; i++)
+                {
 
-                        table.getItems().add(accountList.get(i));
-                        statusBar.setText("Database Loaded");
+                    //create the rows in the table
+                    accountCol.setCellValueFactory(new PropertyValueFactory<>("info"));
+                    passwordCol.setCellValueFactory(new PropertyValueFactory<>("mask"));
+
+                    table.getItems().add(accountList.get(i));
+
+                    currentCat = "TreeItem [ value: " + accountList.get(i).getCategory() + " ]";
+
+                    //add new categories if they exist in db
+                    for (int j = 1; j < treeSize; j++)
+                    {
+                        treeCat = tree.getTreeItem(j).toString();
+                        if (treeCat.equalsIgnoreCase(currentCat))
+                        {
+                            catExists = true;
+                        }
+                    }
+                    //if category doesn't exist in the tree, add it!
+                    if (!catExists)
+                    {
+                        category = accountList.get(i).getCategory();
+                        addCategory(treeRoot);
+                        category = "";
+                    }
+                    catExists = false;
+                    statusBar.setText("Database Loaded");
                   }
             }
         });
@@ -390,25 +567,193 @@ public class AccountManager extends Application
             stage.showAndWait();
 
             int i = 0;
-            int size = accountList.size();
+            int size = accountList.size(); //account list size
+            tree.getRoot().setExpanded(true); //expand the tree
+            int treeSize = tree.getExpandedItemCount(); //size of tree
+            String currentCat = ""; //current category
+            String treeCat = ""; //cat from tree
+            boolean catExists = false; //check if category exists
 
             //clear the table
             table.getItems().clear();
-
             for (i = 0; i < size; i++)
             {
 
                 //create the rows in the table
-                accountCol.setCellValueFactory(new PropertyValueFactory<>("info"));
-                passwordCol.setCellValueFactory(new PropertyValueFactory<>("mask"));
+               accountCol.setCellValueFactory(new PropertyValueFactory<>("info"));
+               passwordCol.setCellValueFactory(new PropertyValueFactory<>("mask"));
 
                 table.getItems().add(accountList.get(i));
+                
+                currentCat = "TreeItem [ value: " + accountList.get(i).getCategory() + " ]";
+                
+                //add new categories if they exist in db
+                for(int j = 1; j < treeSize; j++)
+                {
+                    treeCat = tree.getTreeItem(j).toString();
+                    if(treeCat.equalsIgnoreCase(currentCat))
+                    {
+                        catExists = true;
+                    }
+                }
+                //if category doesn't exist in the tree, add it!
+                if(!catExists)
+                {
+                    category = accountList.get(i).getCategory();
+                    addCategory(treeRoot);
+                    category = "";
+                }
+                catExists = false;
+                
                 statusBar.setText("Database Loaded");
             }
         });
         
+//******EDIT ACCOUNT BUTTON*****************************************************************************************************
+        Button editBtn = new Button();
+        editBtn.setText("Edit Selected Account");
+        editBtn.setOnAction(new EventHandler<ActionEvent>()
+        {
+            @Override
+            public void handle(ActionEvent event)
+            {
+                if(!currentDB.isEmpty() && !accountList.isEmpty())
+                {
+                  int i = 0;
+                  Account a = table.getFocusModel().getFocusedItem();
+                  EditAccount edit = new EditAccount();
+                  String accountLabel = a.getLabel();
+                  int target = 0;
+
+                    for (i = 0; i < accountList.size(); i++)
+                    {
+                        if (accountList.get(i).compareToString(a.getLabel()))
+                        {
+                            target = i;
+                            System.out.println("Target Found");
+                        }
+                        else
+                        {
+                            if (i == accountList.size() - 1)
+                            {
+                                System.out.println("Account not found");
+                            }
+                        }
+                    }
+
+                  stage.setScene(edit.openScene(stage,currentDB,masterPassword,a,target));
+                  stage.showAndWait();
+                  
+                  int size = accountList.size(); //account list size
+                tree.getRoot().setExpanded(true); //expand the tree
+                int treeSize = tree.getExpandedItemCount(); //size of tree
+                String currentCat = ""; //current category
+                String treeCat = ""; //cat from tree
+                boolean catExists = false; //check if category exists
+
+                //clear the table
+                table.getItems().clear();
+                for (i = 0; i < size; i++)
+                {
+
+                    //create the rows in the table
+                    accountCol.setCellValueFactory(new PropertyValueFactory<>("info"));
+                    passwordCol.setCellValueFactory(new PropertyValueFactory<>("mask"));
+
+                    table.getItems().add(accountList.get(i));
+
+                    currentCat = "TreeItem [ value: " + accountList.get(i).getCategory() + " ]";
+
+                    //add new categories if they exist in db
+                    for (int j = 1; j < treeSize; j++)
+                    {
+                        treeCat = tree.getTreeItem(j).toString();
+                        if (treeCat.equalsIgnoreCase(currentCat))
+                        {
+                            catExists = true;
+                        }
+                    }
+                    //if category doesn't exist in the tree, add it!
+                    if (!catExists)
+                    {
+                        category = accountList.get(i).getCategory();
+                        addCategory(treeRoot);
+                        category = "";
+                    }
+                    catExists = false;
+                  }
+                }
+                //otherwise open an error page
+                  else
+                  {
+                      stage.setScene(error.openScene(stage));
+                      
+                      stage.showAndWait();
+                      statusBar.setText("Error: Account not added");
+                  }
+            }
+        });
+//******DELETE ACCOUNT BUTTON*****************************************************************************************************
+        Button deleteBtn = new Button();
+        deleteBtn.setText("Delete Selected Account");
+        deleteBtn.setOnAction(new EventHandler<ActionEvent>()
+        {
+            @Override
+            public void handle(ActionEvent event)
+            {
+                if(!currentDB.isEmpty() && !accountList.isEmpty())
+                {
+                  int i = 0;
+                  Account a = table.getFocusModel().getFocusedItem();
+                  String accountLabel = a.getLabel() + "";
+                    
+                    DeleteAccount delete = new DeleteAccount();
+                    
+
+                for (i = 0; i < accountList.size(); i++)
+                {
+                    if (accountList.get(i).compareToString(a.getLabel()))
+                    {
+                        stage.setScene(delete.openScene(stage, currentDB, masterPassword, a, i));
+                        stage.showAndWait();
+                        break;
+                        //accountList.remove(i);
+                    }
+                    else
+                    {
+                        if (i == accountList.size() - 1)
+                        {
+                            System.out.println("Account not found/No account was deleted.");
+                        }
+                    }
+                }
+                  
+                  //clear the table
+                  table.getItems().clear();
+                  
+                  for(i = 0; i < accountList.size(); i++)
+                  {
+                   
+                  //create the rows in the table
+                        accountCol.setCellValueFactory(new PropertyValueFactory<>("info"));
+                        passwordCol.setCellValueFactory(new PropertyValueFactory<>("mask"));
+
+                        table.getItems().add(accountList.get(i));
+                  }
+                }
+                  //otherwise open an error page
+                  else
+                  {
+                      stage.setScene(error.openScene(stage));
+                      
+                      stage.showAndWait();
+                      statusBar.setText("Error: Account not added");
+                  }
+            }
+        });
+        
         //add buttons
-        toolBar.getItems().addAll(loadDatabase,createDB,addAccount);
+        toolBar.getItems().addAll(loadDatabase,createDB,addAccount,editBtn,deleteBtn);
         
         
         
@@ -416,7 +761,11 @@ public class AccountManager extends Application
         Separator s = new Separator();
         s.setOrientation(Orientation.HORIZONTAL);
         
+
         
+       
+        
+//******SCENE SETUP*****************************************************************************************************        
         //size the columns for table
         table.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
         accountCol.setMaxWidth( 1f * Integer.MAX_VALUE * 50 ); // 50% width
@@ -438,6 +787,7 @@ public class AccountManager extends Application
         vboxTable.setVgrow(table, Priority.ALWAYS);
         root.setTop(vbox);
         root.setRight(vboxTable);
+        root.setLeft(tree);
         root.setBottom(statusBar);
         
         Scene scene = new Scene(root, 750, 500);//displaying scene with everything in root
@@ -446,37 +796,95 @@ public class AccountManager extends Application
         primaryStage.show();
     }
     
-    //use this to add accounts in other scences
-    public void setAccount(String l,String u, String p, String ur, String d)
-    {
-        this.accountList.add(new Account(l,u,p,ur,d));
-    }
+
     
+//******ACCOUNT MANAGER METHODS*****************************************************************************************************
+    //use this to add accounts in other scences
+    public void addAccount(String l,String u, String p, String ur, String d, String c)
+    {
+        this.accountList.add(new Account(l,u,p,ur,d,c));
+    }
+    //use this to edit accounts in other scences
+    public void editAccount(int i,String l,String u, String p, String ur, String d, String c)
+    {
+        this.accountList.get(i).setLabel(l);
+        this.accountList.get(i).setUsername(u);
+        this.accountList.get(i).setPassword(p);
+        this.accountList.get(i).setUrl(ur);
+        this.accountList.get(i).setDescription(d);
+        this.accountList.get(i).setCategory(c);
+    }
+    //to get the account list
+    public <Account> ArrayList getAccountList()
+    {
+        return this.accountList;
+    }
+    //use this to clear account list
     public void clearAccount()
     {
         this.accountList.clear();
     }
-    
+    //use this to print account details
     public void printAccount(int i)
     {
         this.accountList.get(i).writeOutput();
     }
-    
+    //use this to get master password
     public void getMasterPassword(String p)
     {
         this.masterPassword = p;
     }
-    
+    //use this to get file location
     public void getDB(String d)
     {
         this.currentDB = d;
     }
-    
+    //use this to give the status bar a massage
     public void setStatusBar(String s)
     {
         this.statusBar.setText(s);
     }
+    //use this to get the name of a new category
+    public void getCategory(String c)
+    {
+        this.category = c;
+    }
+    //use this to get the delete account decision
+    public void deleteChoice(boolean choice)
+    {
+        this.deleteInputChoice = choice;
+    }
+    //use this to create a new category
+    public void addCategory(TreeItem<String> treeRoot)
+    {
+        if(!category.isEmpty())
+        {
+            //add a new folder
+            Node treeIcon162 = new ImageView(
+            new Image(getClass().getResourceAsStream("resources/FOLDER16.png"))
+             );
+            TreeItem<String> general = new TreeItem<String>(category,treeIcon162);
+            treeRoot.getChildren().add(general);
+        }
+    }
+    //for category actions
+    private String handleMouseClicked(MouseEvent event, TreeView treeView)
+    {
+        Node node = event.getPickResult().getIntersectedNode();
+        String name = "All";
+        // Accept clicks only on node cells, and not on empty spaces of the TreeView
+        if (node instanceof Text || (node instanceof TreeCell && ((TreeCell) node).getText() != null))
+        {
+            name = (String) ((TreeItem) treeView.getSelectionModel().getSelectedItem()).getValue();
+            if(name.equalsIgnoreCase("categories"))
+            {
+                name = "All";
+            }
+        }
+        return name;
+    }
     
+//***BELOW IS FOR REVEAL BUTTON AND EDIT MENU****************************************
     //needed for reveal password
     private void updateCell(ObservableSet<Account> usersWithShownPasswords,
             TableCell<Account, String> cell) {
@@ -533,6 +941,7 @@ public class AccountManager extends Application
   return null;  
  }
  
+ //code for paste - TO DO
  public void paste() {
   
   if( !systemClipboard.hasContent(DataFormat.PLAIN_TEXT) ) {
@@ -567,7 +976,7 @@ public class AccountManager extends Application
    
 
 
-//**Main*****************************************************************
+//******MAIN*****************************************************************************************************
     public static void main(String[] args) throws IOException
     {
         launch(args);

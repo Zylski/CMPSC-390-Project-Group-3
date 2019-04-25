@@ -17,7 +17,7 @@ import javafx.scene.control.ToggleButton;
 
 //class account
 
-public class Account 
+public class Account implements Comparable<Account>
 {
     //attributes
     private String label;
@@ -25,6 +25,7 @@ public class Account
     private String password;
     private String url;
     private String description;
+    private String category;
     private final StringProperty userNamep = new SimpleStringProperty();
     private final StringProperty passwordp = new SimpleStringProperty();
     AccountManager account = new AccountManager();
@@ -37,14 +38,16 @@ public class Account
         password = "None";
         url = "None";
         description = "None";
+        category = "None";
     }
-    public Account(String l, String u, String p, String ur, String d)
+    public Account(String l, String u, String p, String ur, String d, String c)
     {
         label = l;
         username = u;
         password = p;
         url = ur;
         description = d;
+        category = c;
     }
     //mutators
     //label
@@ -71,6 +74,11 @@ public class Account
     public void setDescription(String d)
     {
         description = d;
+    }
+    //category
+    public void setCategory(String c)
+    {
+        category = c;
     }
     //accessors
     //label
@@ -99,6 +107,11 @@ public class Account
     {
         return description;
     }
+    //category
+    public String getCategory()
+    {
+        return category;
+    }
     
     //description
     public String getInfo()
@@ -107,6 +120,7 @@ public class Account
         info += "\nUsername: " + username;
         info += "\nURL/Location: " + url;
         info += "\nDescription: " + description;
+        info += "\nCategory: " + category;
         return info;
     }
     
@@ -130,6 +144,7 @@ public class Account
         System.out.println("Username: " + username);
         System.out.println("URL/Location: " + url);
         System.out.println("Description: " + description);
+        System.out.println("Category: " + category);
         return "";
     }
     //Same label?
@@ -142,21 +157,32 @@ public class Account
         return false;
     }
     //CompareTo
+    @Override
     public int compareTo(Account a)
     {//comparing labels
-        if(this.label.compareToIgnoreCase(a.label) > 1) //greater
+        if(this.label.compareTo(a.label) > 1) //greater
         {
             return 1;
         }
-        else if(this.label.compareToIgnoreCase(a.label) < 1) //lesser
+        else if(this.label.compareTo(a.label) < 1) //lesser
         {
             return -1;
         }
-        else if(this.label.compareToIgnoreCase(a.label) == 0) //equal
+        else if(this.label.compareTo(a.label) == 0) //equal
         {
             return 0; 
         }
         return 0; //default
+    }
+    
+    public boolean compareToString(String a)
+    {//comparing labels
+        if(label.equals(a) == true){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
     
     //toString
