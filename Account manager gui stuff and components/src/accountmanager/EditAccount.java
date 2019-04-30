@@ -118,11 +118,7 @@ public class EditAccount
         TextField categoryField = new TextField();
         grid.add(categoryField, 1, 6);
         categoryField.setText(a.getCategory());
-        if(fieldCategory.equalsIgnoreCase("all") || fieldCategory.equalsIgnoreCase("categories"))
-        {
-            fieldCategory = "General";
-        }
-        categoryField.setText(fieldCategory);
+        
         
         //Description
         Label descLabel = new Label("Description:");
@@ -199,11 +195,17 @@ public class EditAccount
                     {
                         category = "General";
                     }
+                    if(fieldCategory.equalsIgnoreCase("all") || fieldCategory.equalsIgnoreCase("categories"))
+                    {
+                        fieldCategory = "General";
+                    }
+                    categoryField.setText(fieldCategory);
                     //TEMP Display input fields
                     submitPress.setText("Account Edited\n");
                     
                     System.out.println(target);
                     
+                    //edit said account!
                     account.editAccount(target, labelInput, userNameInput, passWordInput, urlInput, description, category);
                     
                     //Do this to clear a file?
@@ -251,7 +253,8 @@ public class EditAccount
                     for(int i = 0; i < accountList.size(); i++)
                     {
                         a = new JsonAccount(accountList.get(i).getLabel(),accountList.get(i).getUsername(),accountList.get(i).getPassword(),
-                                accountList.get(i).getUrl(),accountList.get(i).getDescription(),accountList.get(i).getCategory());
+                                accountList.get(i).getUrl(),accountList.get(i).getDescription(),accountList.get(i).getCategory(),
+                                accountList.get(i).getSecurityQuestion(),accountList.get(i).getAdditionalProperties());
                         db.addAccount(a);
                     }
 

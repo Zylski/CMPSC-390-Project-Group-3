@@ -16,6 +16,7 @@ import com.google.gson.Gson;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
@@ -254,7 +255,41 @@ public class CreateDatabase
                             
                     writer.close();
                     
+                    //clear last used file
+                    try
+                    {
+                    PrintWriter w = new PrintWriter("LastUsedFile.dat");
+                    w.print("");
+                    w.close();
+                    }
+                    catch (FileNotFoundException ex) 
+                    {
+                        Logger.getLogger(CreateDatabase.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    //Save the last used file location?
+                    PrintWriter w = null;
+                    try 
+                    {
+                        w = new PrintWriter("LastUsedFile.dat", "UTF-8"); //think about using json/xml file
+                    } 
+                    catch (FileNotFoundException ex) 
+                    {
+                        Logger.getLogger(CreateDatabase.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    catch (UnsupportedEncodingException ex) 
+                    {
+                        Logger.getLogger(CreateDatabase.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    
+                    w.print(fileInput);
+                    
+                    w.close();
+                    
+                    //status message
                     submitPress.setText("Database Created");
+                    
+                    //set created boolean
+                    account.isCreated(true);
                     
                     //copy the db back to main stage
                     account.getDB(fileInput);                                      

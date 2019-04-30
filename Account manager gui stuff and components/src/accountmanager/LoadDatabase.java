@@ -13,11 +13,17 @@ package accountmanager;
 import com.google.gson.Gson;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -238,6 +244,8 @@ public class LoadDatabase
                     String url = "NULL";
                     String description = "NULL";
                     String category = "NULL";
+                    ArrayList<SecurityQuestion> sq = null;
+                    ArrayList<AdditionalProperties> ap = null;
                     
                     //decrypt and add accounts to arraylist
                     
@@ -258,10 +266,14 @@ public class LoadDatabase
                             url = db.getAccount().get(i).getUrl();
                             description = db.getAccount().get(i).getDescription();
                             category = db.getAccount().get(i).getCategory();
+                            sq = db.getAccount().get(i).getSecurityQuestion();
+                            ap = db.getAccount().get(i).getAdditionalProperties();
                             
                             //add to account list
-                            accountList.addAccount(label, username, password, url, description, category);
+                            accountList.addAccount(label, username, password, url, description, category, sq, ap);
                         }
+                        
+                        
                      
                     }
                     if(!decrypted.equals(encrypted))
@@ -273,6 +285,36 @@ public class LoadDatabase
                     
                     //copy the master password back to main stage
                     accountList.getMasterPassword(passWordInput);
+                    
+                        //clear last used file
+                        try
+                        {
+                            PrintWriter w = new PrintWriter("LastUsedFile.dat");
+                            w.print("");
+                            w.close();
+                        }
+                        catch (FileNotFoundException ex)
+                        {
+                            Logger.getLogger(CreateDatabase.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        //Save the last used file location?
+                        PrintWriter w = null;
+                        try
+                        {
+                            w = new PrintWriter("LastUsedFile.dat", "UTF-8"); //think about using json/xml file
+                        }
+                        catch (FileNotFoundException ex)
+                        {
+                            Logger.getLogger(CreateDatabase.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        catch (UnsupportedEncodingException ex)
+                        {
+                            Logger.getLogger(CreateDatabase.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+
+                        w.print(f);
+
+                        w.close();
                     }
                     
                     //close the file

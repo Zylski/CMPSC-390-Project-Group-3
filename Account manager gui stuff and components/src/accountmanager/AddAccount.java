@@ -152,6 +152,8 @@ public class AddAccount
                 String urlInput = urlField.getText(); //get url
                 String description = descTextField.getText(); //get description
                 String category = categoryField.getText(); //get category
+                ArrayList<SecurityQuestion> sq = new ArrayList<SecurityQuestion>(); //make new security question arrayList
+                ArrayList<AdditionalProperties> ap = new ArrayList<AdditionalProperties>(); //make new properties arrayList
                 
                 //set text color
                 submitPress.setFill(Color.FIREBRICK);
@@ -224,7 +226,7 @@ public class AddAccount
                     } 
                     
                     //create new account object and add to array list
-                    account.addAccount(labelInput, userNameInput, passWordInput, urlInput, description,category);
+                    account.addAccount(labelInput, userNameInput, passWordInput, urlInput, description,category, sq, ap);
                     
                     //Make new Database object
                     //Database db = new Database();
@@ -251,7 +253,8 @@ public class AddAccount
                     for(int i = 0; i < accountList.size(); i++)
                     {
                         a = new JsonAccount(accountList.get(i).getLabel(),accountList.get(i).getUsername(),accountList.get(i).getPassword(),
-                                accountList.get(i).getUrl(),accountList.get(i).getDescription(),accountList.get(i).getCategory());
+                                accountList.get(i).getUrl(),accountList.get(i).getDescription(),accountList.get(i).getCategory(),
+                                accountList.get(i).getSecurityQuestion(),accountList.get(i).getAdditionalProperties());
                         db.addAccount(a);
                     }
 

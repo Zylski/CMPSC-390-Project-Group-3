@@ -1,12 +1,10 @@
 package accountmanager;
 
+import java.util.ArrayList;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.text.Text;
 
 /*
  *
@@ -26,6 +24,8 @@ public class Account implements Comparable<Account>
     private String url;
     private String description;
     private String category;
+    private ArrayList<SecurityQuestion> SecurityQuestions = new ArrayList<SecurityQuestion>();
+    private ArrayList<AdditionalProperties> AdditionalProperties = new ArrayList<AdditionalProperties>();
     private final StringProperty userNamep = new SimpleStringProperty();
     private final StringProperty passwordp = new SimpleStringProperty();
     AccountManager account = new AccountManager();
@@ -40,7 +40,7 @@ public class Account implements Comparable<Account>
         description = "None";
         category = "None";
     }
-    public Account(String l, String u, String p, String ur, String d, String c)
+    public Account(String l, String u, String p, String ur, String d, String c, ArrayList<SecurityQuestion> sq, ArrayList<AdditionalProperties> ap)
     {
         label = l;
         username = u;
@@ -48,6 +48,8 @@ public class Account implements Comparable<Account>
         url = ur;
         description = d;
         category = c;
+        SecurityQuestions = sq;
+        AdditionalProperties = ap;
     }
     //mutators
     //label
@@ -112,9 +114,43 @@ public class Account implements Comparable<Account>
     {
         return category;
     }
+    //get seq questions
+    public ArrayList<SecurityQuestion> getSecurityQuestion()
+    {
+        return SecurityQuestions;
+    }
+    //set seq questions
+    public void setSecurityQuestion(ArrayList<SecurityQuestion> sq)
+    {
+        this.SecurityQuestions = sq;
+    }
+    //get properties
+    public ArrayList<AdditionalProperties> getAdditionalProperties()
+    {
+        return AdditionalProperties;
+    }
+    //set properties
+    public void setAdditionalProperties(ArrayList<AdditionalProperties> ap)
+    {
+        this.AdditionalProperties = ap;
+    }
     
     //description
-    public String getInfo()
+    public Text getInfo()
+    {
+        String info = "Label: " + label;
+        info += "\nUsername: " + username;
+        info += "\nURL/Location: " + url;
+        info += "\nDescription: " + description;
+        info += "\nCategory: " + category;
+        Text text = new Text(info);
+        text.wrappingWidthProperty().set(250);
+        text.textProperty();
+        return text;
+    }
+    
+    //description
+    public String getStringInfo()
     {
         String info = "Label: " + label;
         info += "\nUsername: " + username;
@@ -160,17 +196,17 @@ public class Account implements Comparable<Account>
     @Override
     public int compareTo(Account a)
     {//comparing labels
-        if(this.label.compareTo(a.label) > 1) //greater
+        if(this.label.compareTo(a.label) == 0) //equal
+        {
+            return 0; 
+        }
+        else if(this.label.compareTo(a.label) > 0) //greater
         {
             return 1;
         }
-        else if(this.label.compareTo(a.label) < 1) //lesser
+        else if(this.label.compareTo(a.label) < 0) //lesser
         {
             return -1;
-        }
-        else if(this.label.compareTo(a.label) == 0) //equal
-        {
-            return 0; 
         }
         return 0; //default
     }

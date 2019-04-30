@@ -101,7 +101,7 @@ public class DeleteAccount
                 //Choose yes or no based on radio button
                 if(rb1.isSelected())
                 {
-                    account.deleteChoice(true);
+                    //account.deleteChoice(true);
                     
                     //remove the account from the list
                     account.getAccountList().remove(target);
@@ -151,7 +151,8 @@ public class DeleteAccount
                     for (int i = 0; i < accountList.size(); i++)
                     {
                         a = new JsonAccount(accountList.get(i).getLabel(), accountList.get(i).getUsername(), accountList.get(i).getPassword(),
-                                accountList.get(i).getUrl(), accountList.get(i).getDescription(), accountList.get(i).getCategory());
+                                accountList.get(i).getUrl(), accountList.get(i).getDescription(), accountList.get(i).getCategory(),
+                                accountList.get(i).getSecurityQuestion(),accountList.get(i).getAdditionalProperties());
                         db.addAccount(a);
                     }
 
@@ -191,7 +192,7 @@ public class DeleteAccount
                 }
                 else
                 {
-                    account.deleteChoice(false);
+                    //account.deleteChoice(false);
                     account.setStatusBar("Account not Deleted");
                 }
 
