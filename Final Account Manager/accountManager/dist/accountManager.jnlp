@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="1.0" xmlns:jfx="http://javafx.com" href="accountManager.jnlp">
+  <information>
+    <title>accountManager</title>
+    <vendor>Zylski</vendor>
+    <description>null</description>
+    <offline-allowed/>
+  </information>
+  <resources>
+    <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
+    <jar href="accountManager.jar" size="345759" download="eager" />
+    <jar href="lib\gson-2.2.4.jar" size="190432" download="eager" />
+  </resources>
+  <applet-desc  width="800" height="600" main-class="com.javafx.main.NoJavaFXFallback"  name="accountManager" >
+    <param name="requiredFXVersion" value="8.0+"/>
+  </applet-desc>
+  <jfx:javafx-desc  width="800" height="600" main-class="accountmanager.AccountManager"  name="accountManager" />
+  <update check="always"/>
+</jnlp>
